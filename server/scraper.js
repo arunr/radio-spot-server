@@ -7,7 +7,8 @@ var url = 'mongodb://localhost:27017/radio-spot';
 MongoClient.connect(url, function(err, db) {
     assert.equal(null, err);
     var collection = db.collection('stations');
-    collection.find({}).each(function(err, item) {
+    var i = 1;
+    collection.find({}).limit(5).each(function(err, item) {
         if (item === null) {
             db.close();
         } else {
@@ -16,7 +17,8 @@ MongoClient.connect(url, function(err, db) {
                     host: 'api.duckduckgo.com',
                     path: '/?q=' + item.letters + '&format=json&pretty=1'
                 }, callback).end();
-            }, 1000);
+            }, 1000*i);
+            i++;
         }
     });
 });
@@ -39,7 +41,7 @@ callback = function(response) {
 	            letters: querystring
 	        }, {
 	            $set: {
-	                description: str
+	                description: JSON.parse(str)
 	            }
 	        }, function(err, result) {
 	            assert.equal(err, null);
